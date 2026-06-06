@@ -1,0 +1,24 @@
+workflows:
+  ios-build:
+    name: Build TnhanPRE IPA
+    instance_type: mac_mini_m1
+    environment:
+      xcode: latest
+    scripts:
+      - name: Build and Archive
+        script: |
+          xcodebuild clean archive \
+            -project TnhanPRE.xcodeproj \
+            -scheme TnhanPRE \
+            -configuration Release \
+            -archivePath $PWD/build/TnhanPRE.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Export to IPA (Payload)
+        script: |
+          mkdir -p Payload
+          mv build/TnhanPRE.xcarchive/Products/Applications/*.app Payload/
+          zip -r TnhanPRE.ipa Payload
+    artifacts:
+      - TnhanPRE.ipa
